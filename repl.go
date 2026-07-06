@@ -29,6 +29,12 @@ func startRepl(cfg *config) {
 			continue
 		}
 		commandName := words[0]
+		var args []string
+		if len(words) > 1 {
+			args = words[1:]
+		} else {
+			args = nil
+		}
 
 		command_registry := getCommandRegistry()
 		command, ok := command_registry[commandName]
@@ -36,7 +42,7 @@ func startRepl(cfg *config) {
 			fmt.Println("Unknown command")
 			continue
 		}
-		if err := command.callback(cfg); err != nil {
+		if err := command.callback(cfg, args); err != nil {
 			fmt.Printf("Error with command %s: %v", command.name, err)
 		}
 	}
@@ -71,7 +77,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 func getCommandRegistry() map[string]cliCommand {
@@ -95,6 +101,11 @@ func getCommandRegistry() map[string]cliCommand {
 			name:        "mapb",
 			description: "Show the previous 20 locations",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "Show the list of pokemon in the requested location. Pass the location as an argument",
+			callback:    commandExplore,
 		},
 	}
 }
