@@ -4,15 +4,10 @@ import "time"
 
 func NewCache(interval time.Duration) *Cache {
 	my_cache := &Cache{
-		cache:    make(map[string]CacheEntry),
-		interval: interval,
+		cache: make(map[string]CacheEntry),
+		ttl:   interval,
 	}
-	ticker := time.NewTicker(interval)
-	go func() {
-		for range ticker.C {
-			my_cache.reapLoop()
-		}
-	}()
+	go my_cache.reapLoop(interval)
 	return my_cache
 }
 
@@ -29,20 +24,24 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	val, ok := c.cache[key]
-	if !ok {
-		return nil, false
-	}
-	return val.val, true
+	return val.val, ok
 }
 
-func (c *Cache) reapLoop() {
+func (c *Cache) reapLoop(interval time.Duration) {
+	ticker := time.NewTicker(interval)
+	for range ticker.C {
+		c.reap()
+	}
+}
+
+func (c *Cache) reap() {
 	var key_to_del []string
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	for key, value := range c.cache {
-		if time.Since(value.createdAt) > c.interval {
+		if time.Since(value.createdAt) > c.ttl {
 			key_to_del = append(key_to_del, key)
 		}
 	}
