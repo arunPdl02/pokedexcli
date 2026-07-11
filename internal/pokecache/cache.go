@@ -1,11 +1,15 @@
 package pokecache
 
-import "time"
+import (
+	"sync"
+	"time"
+)
 
 func NewCache(interval time.Duration) *Cache {
 	my_cache := &Cache{
 		cache: make(map[string]CacheEntry),
 		ttl:   interval,
+		mu:    &sync.Mutex{},
 	}
 	go my_cache.reapLoop(interval)
 	return my_cache
