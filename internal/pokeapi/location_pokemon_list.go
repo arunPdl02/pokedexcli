@@ -9,7 +9,6 @@ import (
 
 func (c *Client) ListPokemonsInLocation(location *string) (RespLocationPokemons, error) {
 	url := baseURL + "/location-area/" + *location
-	fmt.Println(url)
 
 	if data, ok := c.cache.Get(url); ok {
 		var pokemons RespLocationPokemons
