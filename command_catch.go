@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 )
 
 func commandCatch(cfg *config, args ...string) error {
@@ -14,8 +15,19 @@ func commandCatch(cfg *config, args ...string) error {
 		return err
 	}
 
-	// TODO: add catch logic using base experience, assume max base experience is 635 for chansey
-	fmt.Printf("Base Experience of %s is %d\n", args[0], pokemon.BaseExperience)
+	NORMALIZER := 1200.00
+	base_experience := float64(pokemon.BaseExperience)
+	normalized_base_experience := (NORMALIZER - base_experience) / NORMALIZER
 
+	caught_chance := normalized_base_experience * float64(rand.Intn(20))
+	// fmt.Printf("Base Experience of %s is %d, and it's normalized version is %f\n", args[0], pokemon.BaseExperience, normalized_base_experience)
+	// fmt.Printf("Catch change is %f\n", caught_chance)
+
+	if caught_chance < 10 {
+		fmt.Printf("%s escaped!\n", pokemon.Name)
+		return nil
+	}
+	fmt.Printf("%s was caught!\n", pokemon.Name)
+	cfg.caughtPokemon[pokemon.Name] = pokemon
 	return nil
 }
