@@ -103,6 +103,11 @@ func getCommandRegistry() map[string]cliCommand {
 			description: "show the detail of a caught pokemon",
 			callback:    commandInspect,
 		},
+		"pokedex": {
+			name:        "pokedex",
+			description: "show the list of pokemon caught so far",
+			callback:    commandPokedex,
+		},
 		"map": {
 			name:        "map",
 			description: "Show the next 20 locations",
